@@ -15,6 +15,9 @@ OBJ = main.o
 main: $(OBJ)
 		$(CC) $(CPPFLAGS) $(OBJ) -o main -L$(CPX_LIBDIR) $(CPX_LDFLAGS)
 
+#main.o : main.cpp
+#	$(CC) $(CCOPTS) main.cpp -I$(CPX_INCDIR)
+
 clean:
 		rm -rf $(OBJ) main
 
