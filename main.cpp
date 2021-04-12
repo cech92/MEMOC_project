@@ -37,60 +37,77 @@ char nth_letter(int n)
     return "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"[n % 50];
 }
 
-void setCosts(std::string &filePath, int &numVars) {
+void setCosts(std::string &filePath) {
     std::string token;
     size_t pos = 0;
     int j = 0;
     std::string fp = filePath;
     std::ifstream infile("inputs/" + fp);
 
-    while ((pos = filePath.find("_")) != std::string::npos) {
-        token = filePath.substr(0, pos);
-        cout << "token " << token << std::endl;
-        if (j == 2) {
-            numVars = std::stoi(token);
-            break;
-        }
-        filePath.erase(0, pos + 1);
-        j += 1;
-    }
+//    while ((pos = filePath.find("_")) != std::string::npos) {
+//        token = filePath.substr(0, pos);
+//        cout << "token " << token << std::endl;
+//        if (j == 2) {
+//            numVars = std::stoi(token);
+//            break;
+//        }
+//        filePath.erase(0, pos + 1);
+//        j += 1;
+//    }
 
-    cout << "num vars " << numVars << endl;
-    N = numVars;
-    costs.reserve(numVars); // time taken by drill to move from i to j, ∀ (i, j) ∈ A
-    indexes.reserve(numVars);
-
+    int i = -1;
     std::string line;
-    int i = 0;
-    while (std::getline(infile, line)) {
-        indexes[i] = i;
-        costs[i].reserve(numVars);
-        std::istringstream iss(line);
-        double x1, y1;
-        if (!(iss >> x1 >> y1)) { break; } // error
-//        cout << x1 << " " << y1 << std::endl;
-        std::string line2;
 
-        std::ifstream infile2("inputs/" + fp);
-        int j = 0;
-        while (std::getline(infile2, line2)) {
-            std::istringstream iss2(line2);
-            double x2, y2;
-            if (!(iss2 >> x2 >> y2)) { break; } // error
-//            cout << "2: " << x2 << " " << y2 << std::endl;
-            // process pair (a,b)
-            if (x1 == x2 && y1 == y2) {
-                costs[i].push_back(0.0);
-            } else {
-                costs[i].push_back(sqrt((x1-x2) * (x1-x2) + (y1-y2) * (y1-y2)));
-            }
-            ++j;
+    while (std::getline(infile, line)) {
+        std::istringstream iss(line);
+        cout << "line " << line << endl;
+        if (i == -1) {
+            iss >> N;
+            costs.reserve(N); // time taken by drill to move from i to j, ∀ (i, j) ∈ A
+            indexes.reserve(N);
+        } else {
+            indexes[i] = i;
+            costs[i].reserve(N);
+            double input_result;
+            while (iss >> input_result)
+                costs[i].push_back(input_result);
         }
         ++i;
     }
+    cout << "num vars " << N << endl;
+//    N = numVars;
 
-    for (int i = 0; i < numVars; i++) {
-        for (int j = 0; j < numVars; j++) {
+
+
+//    while (std::getline(infile, line)) {
+//        indexes[i] = i;
+//        costs[i].reserve(numVars);
+//        std::istringstream iss(line);
+//        double x1, y1;
+//        if (!(iss >> x1 >> y1)) { break; } // error
+////        cout << x1 << " " << y1 << std::endl;
+//        std::string line2;
+//
+//        std::ifstream infile2("inputs/" + fp);
+//        int j = 0;
+//        while (std::getline(infile2, line2)) {
+//            std::istringstream iss2(line2);
+//            double x2, y2;
+//            if (!(iss2 >> x2 >> y2)) { break; } // error
+////            cout << "2: " << x2 << " " << y2 << std::endl;
+//            // process pair (a,b)
+//            if (x1 == x2 && y1 == y2) {
+//                costs[i].push_back(0.0);
+//            } else {
+//                costs[i].push_back(sqrt((x1-x2) * (x1-x2) + (y1-y2) * (y1-y2)));
+//            }
+//            ++j;
+//        }
+//        ++i;
+//    }
+
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) {
             cout << costs[i][j] << " ";
         }
         cout << "\n";
@@ -432,7 +449,7 @@ int main(int argc, char const *argv[]) {
         std::vector <std::string> filesOrdered;
         if (dr) {
             while ((dp = readdir(dr)) != NULL) {
-                if (std::string(dp->d_name).find(".txt") != std::string::npos) {
+                if (std::string(dp->d_name).find("distances") != std::string::npos) {
                     filesOrdered.push_back(std::string(dp->d_name));
                 }
             }
@@ -444,8 +461,8 @@ int main(int argc, char const *argv[]) {
             std::string outputPath = "outputs/" + filePath.substr(0, filePath.size() - 4) + ".sol";
             std::cout << filePath << std::endl;
 
-            std::cout << "Num vars " << numVars << std::endl;
-            setCosts(filePath, numVars);
+//            std::cout << "Num vars " << numVars << std::endl;
+            setCosts(filePath);
             //                std::cout << entry.path() << std::endl;
             std::chrono::steady_clock::time_point start = std::chrono::high_resolution_clock::now();
             solver(env, lp);
@@ -471,7 +488,7 @@ int main(int argc, char const *argv[]) {
             auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
             cout << "Time taken by function: "
                  << duration.count() << " milliseconds" << endl;
-            break;
+//            break;
         }
 
     } catch(std::exception& e)
