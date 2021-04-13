@@ -462,17 +462,19 @@ int main(int argc, char const *argv[]) {
 
 //            std::cout << "Num vars " << numVars << std::endl;
 //            setCosts(filePath);
-            Problem *problem = new Problem(filePath);
+            Problem* problem = new Problem(filePath);
             //                std::cout << entry.path() << std::endl;
             std::chrono::steady_clock::time_point start = std::chrono::high_resolution_clock::now();
 
-            CPLEXSolver *cplexSolver = new CPLEXSolver(problem);
-//            cplexSolver->solve();
-//
-//            std::chrono::steady_clock::time_point end = std::chrono::high_resolution_clock::now();
-//            auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-//            cout << "Time taken by function: " << duration.count() << " milliseconds" << endl;
+            CPLEXSolver* cplexSolver = new CPLEXSolver(problem);
+            cplexSolver->solve();
 
+            std::chrono::steady_clock::time_point end = std::chrono::high_resolution_clock::now();
+            auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+            cout << "Time taken by function: " << duration.count() << " milliseconds" << endl;
+
+            delete cplexSolver;
+            delete problem;
 //            solver(env, lp);
 //
 //            CHECKED_CPX_CALL(CPXmipopt, env, lp);

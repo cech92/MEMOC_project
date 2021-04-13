@@ -1,27 +1,47 @@
 #include <iostream>
+#include <vector>
 #include "cplex_solver.h"
 
 using namespace std;
 
-CPLEXSolver::CPLEXSolver(Problem *problem) {
+CPLEXSolver::CPLEXSolver(Problem* problem) {
+    this->problem = problem;
+
+    this->env = CPXopenCPLEX(&status);
+    if (status){
+        CPXgeterrorstring(NULL, status, errmsg);
+        int trailer = std::strlen(errmsg) - 1;
+        if (trailer >= 0) errmsg[trailer] = '\0';
+        throw std::runtime_error(std::string(__FILE__) + ":" + STRINGIZE(__LINE__) + ": " + errmsg);
+    }
+    this->lp = CPXcreateprob(env, &status, "");
+    if (status){
+        CPXgeterrorstring(NULL, status, errmsg);
+        int trailer = std::strlen(errmsg) - 1;
+        if (trailer >= 0) errmsg[trailer] = '\0';
+        throw std::runtime_error(std::string(__FILE__) + ":" + STRINGIZE(__LINE__) + ": " + errmsg);
+    }
+
+    vector<vector<double>> costs = problem->getCosts();
+    vector<int> indexes = problem->getIndexes();
     unsigned int N = problem->getN();
+
     map_y.resize(N);
 
-    cout << "N " << N << endl;
     for (int i = 0; i < N; i++) {
         map_y[i].resize(N);
         for (int j = 0; j < N; j++) {
             map_y[i][j] = -1;
         }
     }
-    int current_y_var_position = 0;
 
+    int current_y_var_position = 0;
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) {
             if (i == j)
                 continue;
             char y_type = 'B';
-            double obj = problem->getCosts()[i][j];
+            double obj = costs[i][j];
             double lb = 0.0;
             double ub = 1.0;
             snprintf(name, NAME_SIZE, "y_%d_%d", indexes[i], indexes[j]);
@@ -130,7 +150,7 @@ CPLEXSolver::CPLEXSolver(Problem *problem) {
             idx[1] = map_y[i][j];
             std::vector<double> coef(2);
             coef[0] = 1.0;
-            coef[1] = -(N - 1);
+            coef[1] = (N - 1) * (-1.0);
             char sense = 'L';
             double rhs = 0.0;
             snprintf(name, NAME_SIZE, "att_%d_%d", i, j);
@@ -144,18 +164,18 @@ CPLEXSolver::CPLEXSolver(Problem *problem) {
 }
 
 void CPLEXSolver::solve() {
-//    CHECKED_CPX_CALL(CPXmipopt, env, lp);
-//
-//    double objval;
-//    CHECKED_CPX_CALL(CPXgetobjval, env, lp, &objval);
-//    std::cout << "Obj val: " << objval << std::endl;
-//
-//    int num = CPXgetnumcols(env, lp);
-//    std::vector<double> vars;
-//    vars.resize(num);
-//    int fromIdx = 0;
-//    int toIdx = num - 1;
-//    CHECKED_CPX_CALL(CPXgetx, env, lp, &vars[0], fromIdx, toIdx);
-//
-//    CHECKED_CPX_CALL(CPXsolwrite, env, lp, "solution.sol");
+    CHECKED_CPX_CALL(CPXmipopt, env, lp);
+
+    double objval;
+    CHECKED_CPX_CALL(CPXgetobjval, env, lp, &objval);
+    std::cout << "Obj val: " << objval << std::endl;
+
+    int num = CPXgetnumcols(env, lp);
+    std::vector<double> vars;
+    vars.resize(num);
+    int fromIdx = 0;
+    int toIdx = num - 1;
+    CHECKED_CPX_CALL(CPXgetx, env, lp, &vars[0], fromIdx, toIdx);
+
+    CHECKED_CPX_CALL(CPXsolwrite, env, lp, "solution.sol");
 }
