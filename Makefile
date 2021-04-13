@@ -7,7 +7,7 @@ CPX_INCDIR  = $(CPX_BASE)/cplex/include
 CPX_LIBDIR  = $(CPX_BASE)/cplex/lib/x86-64_osx/static_pic
 CPX_LDFLAGS = -lcplex -lm -pthread -ldl
 
-OBJ = main.o
+OBJ = main.o problem.o
 
 %.o: %.cpp
 		$(CC) $(CPPFLAGS) -I$(CPX_INCDIR) -c $^ -o $@
