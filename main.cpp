@@ -11,21 +11,21 @@
 #include <libgen.h>
 #include <math.h>
 #include "cpxmacro.h"
-#include "problem.h"
+#include "cplex/cplex_solver.h"
 
 using namespace std;
 
-int status;
-char errmsg[BUF_SIZE];
+//int status;
+//char errmsg[BUF_SIZE];
 
-const int NAME_SIZE = 512;
-char name[NAME_SIZE];
+//const int NAME_SIZE = 512;
+//char name[NAME_SIZE];
 
 //vector<vector<double> > costs;
-vector<vector<int> > map_y; // 1 if arc from i to j used, 0 otherwise, ∀ (i, j) ∈ A
-vector<vector<int> > map_x; // amount of the flow shipped from i to j, ∀ (i, j) ∈ A
-vector<int> indexes; // amount of the flow shipped from i to j, ∀ (i, j) ∈ A
-int first_index = 0;
+//vector<vector<int> > map_y; // 1 if arc from i to j used, 0 otherwise, ∀ (i, j) ∈ A
+//vector<vector<int> > map_x; // amount of the flow shipped from i to j, ∀ (i, j) ∈ A
+//vector<int> indexes; // amount of the flow shipped from i to j, ∀ (i, j) ∈ A
+//int first_index = 0;
 //int N = 0;
 
 //double getRandomValue(double min, double max) {
@@ -432,6 +432,8 @@ int first_index = 0;
 
 int main(int argc, char const *argv[]) {
     try {
+//        DECL_ENV(env);
+//        DECL_PROB(env, lp);
 //        cout << "Choose the number of holes: ";
 //        cin >> numVars;
 //        cout << "The board has " << numVars << " holes\n";
@@ -454,8 +456,6 @@ int main(int argc, char const *argv[]) {
             std::sort(filesOrdered.begin(), filesOrdered.end());
         }
         for(vector<string>::iterator it = std::begin(filesOrdered); it != std::end(filesOrdered); ++it) {
-            DECL_ENV(env);
-            DECL_PROB(env, lp);
             std::string filePath = *it;
             std::string outputPath = "outputs/" + filePath.substr(0, filePath.size() - 4) + ".sol";
             std::cout << filePath << std::endl;
@@ -465,6 +465,14 @@ int main(int argc, char const *argv[]) {
             Problem *problem = new Problem(filePath);
             //                std::cout << entry.path() << std::endl;
             std::chrono::steady_clock::time_point start = std::chrono::high_resolution_clock::now();
+
+            CPLEXSolver *cplexSolver = new CPLEXSolver(problem);
+//            cplexSolver->solve();
+//
+//            std::chrono::steady_clock::time_point end = std::chrono::high_resolution_clock::now();
+//            auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+//            cout << "Time taken by function: " << duration.count() << " milliseconds" << endl;
+
 //            solver(env, lp);
 //
 //            CHECKED_CPX_CALL(CPXmipopt, env, lp);

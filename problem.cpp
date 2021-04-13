@@ -33,3 +33,11 @@ Problem::Problem(string path) {
     }
     cout << "num vars " << N << endl;
 }
+
+vector<vector<double>> Problem::getCosts() {
+    return costs;
+}
+
+unsigned int Problem::getN() {
+    return N;
+}
