@@ -1,3 +1,6 @@
+#ifndef PROBLEM_H
+#define PROBLEM_H
+
 #include <vector>
 #include <string>
 
@@ -14,3 +17,4 @@ public:
     vector<int> getIndexes();
     unsigned int getN();
 };
+#endif

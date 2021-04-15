@@ -1,3 +1,6 @@
+#ifndef CPLEX_SOLVER_H
+#define CPLEX_SOLVER_H
+
 #include "../cpxmacro.h"
 #include "../problem.h"
 
@@ -21,3 +24,5 @@ public:
     CPLEXSolver(Problem* problem);
     void solve();
 };
+
+#endif

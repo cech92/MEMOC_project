@@ -12,6 +12,7 @@
 #include <math.h>
 #include "cpxmacro.h"
 #include "cplex/cplex_solver.h"
+#include "ant_colony/ant_colony_solver.h"
 
 using namespace std;
 
@@ -464,16 +465,35 @@ int main(int argc, char const *argv[]) {
 //            setCosts(filePath);
             Problem* problem = new Problem(filePath);
             //                std::cout << entry.path() << std::endl;
-            std::chrono::steady_clock::time_point start = std::chrono::high_resolution_clock::now();
 
-            CPLEXSolver* cplexSolver = new CPLEXSolver(problem);
-            cplexSolver->solve();
+            cout << "Select method (0: CPLEX, 1: Ant colony): ";
+            int mode;
+            cin >> mode;
 
-            std::chrono::steady_clock::time_point end = std::chrono::high_resolution_clock::now();
-            auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-            cout << "Time taken by function: " << duration.count() << " milliseconds" << endl;
+            if (mode == 1) {
+                std::chrono::steady_clock::time_point start = std::chrono::high_resolution_clock::now();
 
-            delete cplexSolver;
+                AntColonySolver* antColonySolver = new AntColonySolver(problem, 10, 1, 2, 0.1, 20, 0);
+                antColonySolver->solve();
+
+                std::chrono::steady_clock::time_point end = std::chrono::high_resolution_clock::now();
+                auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+                cout << "Time taken by function: " << duration.count() << " milliseconds" << endl;
+
+                delete antColonySolver;
+            } else {
+                std::chrono::steady_clock::time_point start = std::chrono::high_resolution_clock::now();
+
+                CPLEXSolver* cplexSolver = new CPLEXSolver(problem);
+                cplexSolver->solve();
+
+                std::chrono::steady_clock::time_point end = std::chrono::high_resolution_clock::now();
+                auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+                cout << "Time taken by function: " << duration.count() << " milliseconds" << endl;
+
+                delete cplexSolver;
+            }
+
             delete problem;
 //            solver(env, lp);
 //
@@ -500,7 +520,7 @@ int main(int argc, char const *argv[]) {
 //                 << duration.count() << " milliseconds" << endl;
 
 
-//            break;
+            break;
         }
 
     } catch(std::exception& e)

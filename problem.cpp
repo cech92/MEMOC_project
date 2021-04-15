@@ -42,7 +42,6 @@ Problem::Problem(string path) {
 }
 
 vector<vector<double>> Problem::getCosts() {
-    cout <<costs[0][1]<<endl;
     return costs;
 }
 
