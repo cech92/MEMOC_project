@@ -6,6 +6,7 @@
 class AntColonySolver {
 private:
     Problem* problem;
+    vector<vector<double>> costs;
     unsigned int num_cities;
     unsigned int num_ants;
 

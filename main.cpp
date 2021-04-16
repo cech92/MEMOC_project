@@ -473,14 +473,14 @@ int main(int argc, char const *argv[]) {
             if (mode == 1) {
                 std::chrono::steady_clock::time_point start = std::chrono::high_resolution_clock::now();
 
-                AntColonySolver* antColonySolver = new AntColonySolver(problem, 5, 1, 2, 0.1, 10, 0);
+                AntColonySolver* antColonySolver = new AntColonySolver(problem, 20, 1, 2, 0.1, 30, 0);
                 antColonySolver->solve();
 
                 std::chrono::steady_clock::time_point end = std::chrono::high_resolution_clock::now();
                 auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
                 cout << "Time taken by function: " << duration.count() << " milliseconds" << endl;
 
-                delete antColonySolver;
+//                delete antColonySolver;
             } else {
                 std::chrono::steady_clock::time_point start = std::chrono::high_resolution_clock::now();
 

@@ -11,6 +11,7 @@ using namespace std;
 
 AntColonySolver::AntColonySolver(Problem* problem, unsigned int num_ants, double alpha, double beta, double rho, unsigned int max_iterations, unsigned int max_execution_time) {
     this->problem = problem;
+    this->costs = problem->getCosts();
     this->num_cities = problem->getN();
     this->num_ants = num_ants;
     this->alpha = alpha;
@@ -98,20 +99,23 @@ void AntColonySolver::solve() {
 //                            cout << allow_list[m] << " ";
 //                        }
 //                        cout << " | ";
-                        probability_matrix[ants_paths[j][count]][allow_list[k]] = pow(pheromones_matrix[ants_paths[j][count]][allow_list[k]], alpha) * pow(visibility_matrix[ants_paths[j][count]][allow_list[k]], beta);
+                        probability_matrix[ants_paths[j][count]][allow_list[k]] =
+                                pow(pheromones_matrix[ants_paths[j][count]][allow_list[k]], alpha) *
+                                pow(visibility_matrix[ants_paths[j][count]][allow_list[k]], beta);
                         probability_sum += probability_matrix[ants_paths[j][count]][allow_list[k]];
                     }
 
                     double summ = 0.0;
                     for (int k = 0; k < allow_list.size(); ++k) {
-                        probability_matrix[ants_paths[j][count]][allow_list[k]] = probability_matrix[ants_paths[j][count]][allow_list[k]] / probability_sum;
-                        summ += probability_matrix[ants_paths[j][count]][allow_list[k]];
-                        cout << summ <<endl;
+                        probability_matrix[ants_paths[j][count]][allow_list[k]] =
+                                probability_matrix[ants_paths[j][count]][allow_list[k]] / probability_sum;
+//                        summ += probability_matrix[ants_paths[j][count]][allow_list[k]];
+//                        cout << summ <<endl;
                     }
                     cout << endl;
 
                     double random = ((double) rand() / (RAND_MAX));
-                    cout << "random value " << random << endl;
+//                    cout << "random value " << random << endl;
 
                     double prob_tot = 0.0;
                     int next_city = -1;
@@ -119,20 +123,30 @@ void AntColonySolver::solve() {
                     for (int k = 0; k < allow_list.size(); ++k) {
                         prob_tot += probability_matrix[ants_paths[j][count]][allow_list[k]];
                         if (random <= prob_tot) {
-                            cout << "city " << allow_list[k] << endl;
                             next_city = allow_list[k];
                             element_to_remove = k;
                             break;
                         }
-                        cout << prob_tot << " " << endl;
-                        cout << "next city " << next_city << endl;
                     }
-                    cout << endl;
 
                     count++;
                     ants_paths[j][count] = next_city;
                     allow_list.erase(allow_list.begin() + element_to_remove);
                 }
+
+                double current_length = 0.0;
+                for (int k = 0; k < ants_paths[j].size() - 1; k++) {
+                    cout << "From " << ants_paths[j][k] << " to " << ants_paths[j][k + 1] << " "
+                         << costs[ants_paths[j][k]][ants_paths[j][k + 1]] << endl;
+                    current_length += costs[ants_paths[j][k]][ants_paths[j][k + 1]];
+                }
+                current_length += costs[ants_paths[j][ants_paths[j].size() - 1]][ants_paths[j][0]];
+                if (current_length < min_length) {
+                    min_length = current_length;
+                    cout << "new min length " << min_length << endl;
+                }
+                cout << "min length " << min_length << endl;
+            }
 
 //                unordered_set<int> tabu_list;
 //                for (int k = 0; k < num_cities - 1; ++k) {
@@ -181,7 +195,6 @@ void AntColonySolver::solve() {
 //                    cout << allow_list.size() << endl;
 //                }
 
-            }
         }
     }
 }
