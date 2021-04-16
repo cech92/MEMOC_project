@@ -65,13 +65,13 @@ void AntColonySolver::solve() {
         for (int i = 0; i < max_iterations; ++i) {
             cout << "iteration n: " << i << endl;
 
-            probability_matrix.resize(num_cities);
-            for (int j = 0; j < num_cities; ++j) {
-                probability_matrix[j].resize(num_cities);
-                for (int k = 0; k < num_cities; ++k) {
-                    probability_matrix[j][k] = pow(pheromones_matrix[j][k], alpha) * pow(visibility_matrix[j][k], beta);
-                }
-            }
+//            probability_matrix.resize(num_cities);
+//            for (int j = 0; j < num_cities; ++j) {
+//                probability_matrix[j].resize(num_cities);
+//                for (int k = 0; k < num_cities; ++k) {
+//                    probability_matrix[j][k] = pow(pheromones_matrix[j][k], alpha) * pow(visibility_matrix[j][k], beta);
+//                }
+//            }
 
             // loop over ants
             for (int j = 0; j < num_ants; j++) {
@@ -88,31 +88,50 @@ void AntColonySolver::solve() {
                 allow_list.erase(allow_list.begin() + ants_paths[j][0]);
 
                 int count = 0;
+                probability_matrix.resize(num_cities);
                 while (allow_list.size() > 0) {
                     double probability_sum = 0.0;
+                    probability_matrix[ants_paths[j][count]].resize(num_cities);
+
                     for (int k = 0; k < allow_list.size(); ++k) {
-                        for (int m = 0; m < allow_list.size(); m++) {
-                            cout << allow_list[m] << " ";
-                        }
-                        cout << " | ";
+//                        for (int m = 0; m < allow_list.size(); m++) {
+//                            cout << allow_list[m] << " ";
+//                        }
+//                        cout << " | ";
+                        probability_matrix[ants_paths[j][count]][allow_list[k]] = pow(pheromones_matrix[ants_paths[j][count]][allow_list[k]], alpha) * pow(visibility_matrix[ants_paths[j][count]][allow_list[k]], beta);
                         probability_sum += probability_matrix[ants_paths[j][count]][allow_list[k]];
-                        cout << probability_sum <<endl;
                     }
+
+                    double summ = 0.0;
                     for (int k = 0; k < allow_list.size(); ++k) {
                         probability_matrix[ants_paths[j][count]][allow_list[k]] = probability_matrix[ants_paths[j][count]][allow_list[k]] / probability_sum;
+                        summ += probability_matrix[ants_paths[j][count]][allow_list[k]];
+                        cout << summ <<endl;
                     }
                     cout << endl;
+
+                    double random = ((double) rand() / (RAND_MAX));
+                    cout << "random value " << random << endl;
+
                     double prob_tot = 0.0;
+                    int next_city = -1;
+                    int element_to_remove = -1;
                     for (int k = 0; k < allow_list.size(); ++k) {
                         prob_tot += probability_matrix[ants_paths[j][count]][allow_list[k]];
-                        cout << prob_tot << " ";
+                        if (random <= prob_tot) {
+                            cout << "city " << allow_list[k] << endl;
+                            next_city = allow_list[k];
+                            element_to_remove = k;
+                            break;
+                        }
+                        cout << prob_tot << " " << endl;
+                        cout << "next city " << next_city << endl;
                     }
                     cout << endl;
 
-
-
-                    int next_city = 0; // to do
                     count++;
+                    ants_paths[j][count] = next_city;
+                    allow_list.erase(allow_list.begin() + element_to_remove);
                 }
 
 //                unordered_set<int> tabu_list;
