@@ -473,7 +473,7 @@ int main(int argc, char const *argv[]) {
             if (mode == 1) {
                 std::chrono::steady_clock::time_point start = std::chrono::high_resolution_clock::now();
 
-                AntColonySolver* antColonySolver = new AntColonySolver(problem, 10, 1, 2, 0.1, 20, 0);
+                AntColonySolver* antColonySolver = new AntColonySolver(problem, 5, 1, 2, 0.1, 10, 0);
                 antColonySolver->solve();
 
                 std::chrono::steady_clock::time_point end = std::chrono::high_resolution_clock::now();
