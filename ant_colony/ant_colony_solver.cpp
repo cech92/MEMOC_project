@@ -105,6 +105,7 @@ void AntColonySolver::solve() {
                         prob_tot += probability_matrix[ants_paths[j][count]][allow_list[k]];
                         if (random <= prob_tot) {
                             next_city = allow_list[k];
+//                            cout << "next city " << next_city << " | ";
                             element_to_remove = k;
                             break;
                         }
@@ -117,16 +118,17 @@ void AntColonySolver::solve() {
 
                 double current_length = 0.0;
                 vector<int> current_solution;
-                current_solution.reserve(num_cities);
+                current_solution.reserve(num_cities + 1);
                 for (int k = 0; k < ants_paths[j].size() - 1; k++) {
 //                    cout << "From " << ants_paths[j][k] << " to " << ants_paths[j][k + 1] << " "
 //                         << costs[ants_paths[j][k]][ants_paths[j][k + 1]] << endl;
                     current_length += costs[ants_paths[j][k]][ants_paths[j][k + 1]];
                     current_solution.push_back(ants_paths[j][k]);
                 }
-//                cout << endl;
-                current_length += costs[ants_paths[j][ants_paths[j].size() - 1]][ants_paths[j][0]];
+                current_solution.push_back(ants_paths[j][num_cities - 1]);
                 current_solution.push_back(ants_paths[j][0]);
+
+                current_length += costs[ants_paths[j][ants_paths[j].size() - 1]][ants_paths[j][0]];
                 if (current_length < min_length) {
                     min_length = current_length;
                     solution = current_solution;
@@ -156,6 +158,7 @@ void AntColonySolver::solve() {
                 }
             }
         }
-        cout << "Min length " << min_length << endl;
+        problem->setMinCost(min_length);
+        problem->setSolution(solution);
     }
 }

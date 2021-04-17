@@ -11,10 +11,16 @@ private:
     vector<vector<double>> costs;
     vector<int> indexes;
     unsigned int N;
+    vector<int> solution;
+    double min_cost;
 public:
     Problem(string path);
     vector<vector<double>> getCosts();
     vector<int> getIndexes();
     unsigned int getN();
+    void setMinCost(double min_cost);
+    double getMinCost();
+    void setSolution(vector<int> solution);
+    vector<int> getSolution();
 };
 #endif

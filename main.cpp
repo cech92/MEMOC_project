@@ -54,8 +54,19 @@ int main(int argc, char const *argv[]) {
 
                 std::chrono::steady_clock::time_point end = std::chrono::high_resolution_clock::now();
                 auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-                cout << "Time taken by function: " << duration.count() << " milliseconds" << endl;
+
+                cout << "Min cost found is: " << problem->getMinCost() << " (";
+                vector<int> solution = problem->getSolution();
+                for (int i = 0; i < solution.size(); i++) {
+                    cout << solution[i];
+                    if (i < solution.size() -1)
+                        cout << ", ";
+                }
+                cout << ")" << endl;
+                cout << "Time taken by function: " << duration.count() << " milliseconds" << endl << endl;
+
                 delete antColonySolver;
+                break;
             } else {
                 std::chrono::steady_clock::time_point start = std::chrono::high_resolution_clock::now();
 
@@ -64,9 +75,19 @@ int main(int argc, char const *argv[]) {
 
                 std::chrono::steady_clock::time_point end = std::chrono::high_resolution_clock::now();
                 auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+
+                cout << "Min cost found is: " << problem->getMinCost() << " (";
+                vector<int> solution = problem->getSolution();
+                for (int i = 0; i < solution.size(); i++) {
+                    cout << solution[i];
+                    if (i < solution.size() -1)
+                        cout << ", ";
+                }
+                cout << ")" << endl;
                 cout << "Time taken by function: " << duration.count() << " milliseconds" << endl;
 
                 delete cplexSolver;
+                break;
             }
 
             delete problem;

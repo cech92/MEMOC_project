@@ -23,6 +23,7 @@ private:
 public:
     CPLEXSolver(Problem* problem);
     void solve();
+    void findSolution(vector<int>& solution, vector<double>vars, int start);
 };
 
 #endif

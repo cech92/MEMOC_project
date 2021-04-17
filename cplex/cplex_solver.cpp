@@ -168,7 +168,7 @@ void CPLEXSolver::solve() {
 
     double objval;
     CHECKED_CPX_CALL(CPXgetobjval, env, lp, &objval);
-    std::cout << "Obj val: " << objval << std::endl;
+    problem->setMinCost(objval);
 
     int num = CPXgetnumcols(env, lp);
     std::vector<double> vars;
@@ -177,5 +177,20 @@ void CPLEXSolver::solve() {
     int toIdx = num - 1;
     CHECKED_CPX_CALL(CPXgetx, env, lp, &vars[0], fromIdx, toIdx);
 
+    vector<int> solution;
+    findSolution(solution, vars, 0);
+    problem->setSolution(solution);
+
     CHECKED_CPX_CALL(CPXsolwrite, env, lp, "solution.sol");
+}
+
+void CPLEXSolver::findSolution(vector<int>& solution, vector<double>vars, int start) {
+    if (solution.size() > 1 && solution[0] == solution[solution.size() -1])
+        return;
+    for (int i = 0; i < problem->getN(); i++) {
+        if (vars[map_y[start][i]] == 1) {
+            solution.push_back(i);
+            findSolution(solution, vars, i);
+        }
+    }
 }

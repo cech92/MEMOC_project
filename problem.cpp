@@ -7,7 +7,6 @@ using namespace std;
 
 Problem::Problem(string path) {
     string token;
-    size_t pos = 0;
 
     string fp = path;
     std::ifstream infile("inputs/" + fp);
@@ -41,4 +40,20 @@ vector<int> Problem::getIndexes() {
 
 unsigned int Problem::getN() {
     return N;
+}
+
+void Problem::setMinCost(double min_cost) {
+    this->min_cost = min_cost;
+}
+
+double Problem::getMinCost() {
+    return this->min_cost;
+}
+
+void Problem::setSolution(vector<int> solution) {
+    this->solution = solution;
+}
+
+vector<int> Problem::getSolution() {
+    return solution;
 }
