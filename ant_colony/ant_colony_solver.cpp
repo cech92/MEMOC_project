@@ -9,7 +9,7 @@
 using namespace std;
 
 
-AntColonySolver::AntColonySolver(Problem* problem, unsigned int num_ants, double alpha, double beta, double rho, unsigned int max_iterations, unsigned int max_execution_time) {
+AntColonySolver::AntColonySolver(Problem* problem, unsigned int num_ants, double alpha, double beta, double rho, double q, unsigned int max_iterations, unsigned int max_execution_time) {
     this->problem = problem;
     this->costs = problem->getCosts();
     this->num_cities = problem->getN();
@@ -17,12 +17,13 @@ AntColonySolver::AntColonySolver(Problem* problem, unsigned int num_ants, double
     this->alpha = alpha;
     this->beta = beta;
     this->rho = rho;
+    this->q = q;
     this->max_iterations = max_iterations;
     this->max_execution_time = max_execution_time;
 
-    this->min_length = (double) DBL_MAX;
+    this->min_length = DBL_MAX;
 
-    // initialize the pheromone matrix with the same pheromone quantity for each edge
+    // initialize the pheromone matrix (tau) with the same pheromone quantity for each edge
     pheromones_matrix.resize(num_cities);
     for (int i = 0; i < num_cities; i++) {
         pheromones_matrix[i].resize(num_cities);
@@ -37,17 +38,10 @@ AntColonySolver::AntColonySolver(Problem* problem, unsigned int num_ants, double
         visibility_matrix[i].resize(num_cities);
         for (int j = 0; j < num_cities; j++) {
             if (i == j)
-                visibility_matrix[i][j] = 1.0 / 0.00000000001;
+                visibility_matrix[i][j] = 1.0 / DBL_MIN;
             else
                 visibility_matrix[i][j] = 1.0 / problem->getCosts()[i][j];
         }
-    }
-
-    for (int i = 0; i < num_cities; i++) {
-        for (int j = 0; j < num_cities; j++) {
-            cout << visibility_matrix[i][j] << " ";
-        }
-        cout <<endl;
     }
 
     // initialize the ants paths matrix
@@ -76,8 +70,6 @@ void AntColonySolver::solve() {
 
             // loop over ants
             for (int j = 0; j < num_ants; j++) {
-                cout << "ant n: " << j << endl;
-
                 vector<int> allow_list;
                 for (int m = 0; m < num_cities; m++) {
                     allow_list.push_back(m);
@@ -95,27 +87,18 @@ void AntColonySolver::solve() {
                     probability_matrix[ants_paths[j][count]].resize(num_cities);
 
                     for (int k = 0; k < allow_list.size(); ++k) {
-//                        for (int m = 0; m < allow_list.size(); m++) {
-//                            cout << allow_list[m] << " ";
-//                        }
-//                        cout << " | ";
                         probability_matrix[ants_paths[j][count]][allow_list[k]] =
                                 pow(pheromones_matrix[ants_paths[j][count]][allow_list[k]], alpha) *
                                 pow(visibility_matrix[ants_paths[j][count]][allow_list[k]], beta);
                         probability_sum += probability_matrix[ants_paths[j][count]][allow_list[k]];
                     }
 
-                    double summ = 0.0;
                     for (int k = 0; k < allow_list.size(); ++k) {
                         probability_matrix[ants_paths[j][count]][allow_list[k]] =
                                 probability_matrix[ants_paths[j][count]][allow_list[k]] / probability_sum;
-//                        summ += probability_matrix[ants_paths[j][count]][allow_list[k]];
-//                        cout << summ <<endl;
                     }
-                    cout << endl;
 
                     double random = ((double) rand() / (RAND_MAX));
-//                    cout << "random value " << random << endl;
 
                     double prob_tot = 0.0;
                     int next_city = -1;
@@ -135,18 +118,46 @@ void AntColonySolver::solve() {
                 }
 
                 double current_length = 0.0;
+                vector<int> current_solution;
+                current_solution.reserve(num_cities);
                 for (int k = 0; k < ants_paths[j].size() - 1; k++) {
-                    cout << "From " << ants_paths[j][k] << " to " << ants_paths[j][k + 1] << " "
-                         << costs[ants_paths[j][k]][ants_paths[j][k + 1]] << endl;
+//                    cout << "From " << ants_paths[j][k] << " to " << ants_paths[j][k + 1] << " "
+//                         << costs[ants_paths[j][k]][ants_paths[j][k + 1]] << endl;
                     current_length += costs[ants_paths[j][k]][ants_paths[j][k + 1]];
+                    current_solution.push_back(ants_paths[j][k]);
                 }
                 current_length += costs[ants_paths[j][ants_paths[j].size() - 1]][ants_paths[j][0]];
+                current_solution.push_back(ants_paths[j][0]);
                 if (current_length < min_length) {
                     min_length = current_length;
+                    solution = current_solution;
                     cout << "new min length " << min_length << endl;
                 }
-                cout << "min length " << min_length << endl;
             }
+
+            // calculating new pheromone levels
+            vector<vector<double>> delta_tau_table;
+            delta_tau_table.resize(num_cities);
+            for (int j = 0; j < num_cities; j++) {
+                delta_tau_table[j].resize(num_cities);
+                for (int k = 0; k < num_cities; k++) {
+                    delta_tau_table[j][k] = 0;
+                }
+            }
+            for (int j = 0; j < num_ants; j++) {
+                for (int k = 0; k < ants_paths[j].size() - 1; k++) {
+                    delta_tau_table[ants_paths[j][k]][ants_paths[j][k+1]] += 1 / costs[ants_paths[j][k]][ants_paths[j][k + 1]];
+                }
+                delta_tau_table[ants_paths[j][num_cities - 1]][ants_paths[j][0]] += 1 / costs[ants_paths[j][ants_paths[j].size() - 1]][ants_paths[j][0]];
+            }
+//
+//            for (int i = 0; i < num_cities; i++) {
+//                for (int j = 0; j < num_cities; j++) {
+//                    pheromones_matrix[i][j] = (1 - rho) * pheromones_matrix[i][j] + delta_tau_table[i][j];
+//                }
+//            }
+
+
 
 //                unordered_set<int> tabu_list;
 //                for (int k = 0; k < num_cities - 1; ++k) {
@@ -196,5 +207,6 @@ void AntColonySolver::solve() {
 //                }
 
         }
+        cout << "Min length " << min_length << endl;
     }
 }

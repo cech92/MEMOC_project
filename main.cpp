@@ -473,7 +473,7 @@ int main(int argc, char const *argv[]) {
             if (mode == 1) {
                 std::chrono::steady_clock::time_point start = std::chrono::high_resolution_clock::now();
 
-                AntColonySolver* antColonySolver = new AntColonySolver(problem, 20, 1, 2, 0.1, 30, 0);
+                AntColonySolver* antColonySolver = new AntColonySolver(problem, problem->getN() * 2, 1.0, 2.0, 0.1, 1.0, problem->getN() * 2, 0);
                 antColonySolver->solve();
 
                 std::chrono::steady_clock::time_point end = std::chrono::high_resolution_clock::now();
@@ -519,8 +519,6 @@ int main(int argc, char const *argv[]) {
 //            cout << "Time taken by function: "
 //                 << duration.count() << " milliseconds" << endl;
 
-
-            break;
         }
 
     } catch(std::exception& e)

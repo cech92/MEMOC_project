@@ -16,6 +16,7 @@ private:
     double alpha;
     double beta;
     double rho;
+    double q;
 
     vector<vector<double>> pheromones_matrix;
     vector<vector<double>> visibility_matrix;
@@ -25,7 +26,7 @@ private:
     double min_length;
     vector<int> solution;
 public:
-    AntColonySolver(Problem* problem, unsigned int num_ants, double alpha, double beta, double rho, unsigned int max_iterations, unsigned int max_execution_time);
+    AntColonySolver(Problem* problem, unsigned int num_ants, double alpha, double beta, double rho, double q, unsigned int max_iterations, unsigned int max_execution_time);
     void solve();
 };
 
