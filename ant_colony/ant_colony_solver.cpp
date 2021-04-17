@@ -151,9 +151,9 @@ void AntColonySolver::solve() {
                 delta_tau_table[ants_paths[j][num_cities - 1]][ants_paths[j][0]] += 1 / costs[ants_paths[j][ants_paths[j].size() - 1]][ants_paths[j][0]];
             }
 
-            for (int i = 0; i < num_cities; i++) {
-                for (int j = 0; j < num_cities; j++) {
-                    pheromones_matrix[i][j] = (1 - rho) * pheromones_matrix[i][j] + delta_tau_table[i][j];
+            for (int j = 0; j < num_cities; j++) {
+                for (int k = 0; k < num_cities; k++) {
+                    pheromones_matrix[j][k] = (1 - rho) * pheromones_matrix[j][k] + delta_tau_table[j][k];
                 }
             }
 
