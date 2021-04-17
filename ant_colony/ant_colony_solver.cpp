@@ -58,7 +58,6 @@ void AntColonySolver::solve() {
     vector<vector<double>> probability_matrix;
     if (max_iterations > 0) {
         for (int i = 0; i < max_iterations; ++i) {
-            cout << "iteration n: " << i << endl;
 
 //            probability_matrix.resize(num_cities);
 //            for (int j = 0; j < num_cities; ++j) {
@@ -77,7 +76,6 @@ void AntColonySolver::solve() {
 
                 int start_city = rand() % num_cities;
                 ants_paths[j][0] = start_city;
-                cout << "ant n: " << j << " start from city: " << start_city << endl;
                 allow_list.erase(allow_list.begin() + ants_paths[j][0]);
 
                 int count = 0;
@@ -126,6 +124,7 @@ void AntColonySolver::solve() {
                     current_length += costs[ants_paths[j][k]][ants_paths[j][k + 1]];
                     current_solution.push_back(ants_paths[j][k]);
                 }
+//                cout << endl;
                 current_length += costs[ants_paths[j][ants_paths[j].size() - 1]][ants_paths[j][0]];
                 current_solution.push_back(ants_paths[j][0]);
                 if (current_length < min_length) {
@@ -156,56 +155,6 @@ void AntColonySolver::solve() {
                     pheromones_matrix[j][k] = (1 - rho) * pheromones_matrix[j][k] + delta_tau_table[j][k];
                 }
             }
-
-
-
-//                unordered_set<int> tabu_list;
-//                for (int k = 0; k < num_cities - 1; ++k) {
-//                    //remove current and last city from the list of possible cities to visit
-//                    for (int l = k; l >= 0; --l)
-//                        tabu_list.insert(ants_paths[j][l]);
-//
-//                    vector<int> allow_list;
-//                    for (int m = 0; m < num_cities; m++)
-//                        allow_list.push_back(m);
-//
-//                    allow_list.erase(std::remove_if(std::begin(allow_list), std::end(allow_list),
-//                                                    [&tabu_list](int m) {
-//                                                        return std::find(std::begin(tabu_list), std::end(tabu_list),
-//                                                                         m) != std::end(tabu_list);
-//                                                    }),
-//                                     std::end(allow_list));
-//
-//                    for (int m = 0; m < allow_list.size(); m++) {
-//                        cout << allow_list[m] << " ";
-//                    }
-//                    cout << " | ";
-//
-//                    vector<double> probability_array = probability_matrix[ants_paths[j][k]];
-//                    double sum_prob = 0;
-//                    for (int m = 0; m < probability_array.size(); m++) {
-//                        sum_prob += probability_array[m];
-//                    }
-//                    for (int m = 0; m < probability_array.size(); m++) {
-//                        probability_array[m] = probability_array[m] / sum_prob;
-//                    }
-////                    for (int m = 0; m < probability_array.size(); m++) {
-////                        cout << probability_array[m]<<endl;
-////                    }
-//                }
-
-
-//                for (int k = 0; k < num_cities; k++) {
-//                    for (int l = k; l >= 0; l--) {
-//                        cout << j << " " << l << " " << ants_paths[j][l] << endl;
-//                        auto it = std::find(allow_list.begin(), allow_list.end(), ants_paths[j][l]);
-//                        if (it != allow_list.end()) {
-//                            allow_list.erase(it);
-//                        }
-//                    }
-//                    cout << allow_list.size() << endl;
-//                }
-
         }
         cout << "Min length " << min_length << endl;
     }
