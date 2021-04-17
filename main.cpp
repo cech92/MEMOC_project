@@ -442,6 +442,7 @@ int main(int argc, char const *argv[]) {
 //        setupProblem(env, lp, numVars);
 
         // solve problem
+        srand((unsigned int)time(NULL));
         std::string path = "/inputs";
         DIR *dr;
         struct dirent *dp;
