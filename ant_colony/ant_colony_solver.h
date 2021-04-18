@@ -22,6 +22,7 @@ private:
     vector<vector<double>> visibility_matrix;
     vector<vector<int>> ants_paths;
     vector<vector<double>> ants_distances;
+    vector<double> generation_results;
 
     double min_length;
     vector<int> solution;

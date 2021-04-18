@@ -28,7 +28,7 @@ int main(int argc, char const *argv[]) {
             if (mode_str == "1") {
                 mode = stoi(mode_str);
                 if (mode == 1) {
-                    cout << "Select if use Simulated Annealing (0: No, 1: Yes), default 1: ";
+                    cout << "Apply Simulated Annealing (0: No, 1: Yes), default 1? ";
                     cin >> with_sa_str;
                     if (with_sa_str == "0")
                         with_sa = false;
@@ -63,7 +63,7 @@ int main(int argc, char const *argv[]) {
             if (mode == 1) {
                 std::chrono::steady_clock::time_point start = std::chrono::high_resolution_clock::now();
 
-                AntColonySolver* antColonySolver = new AntColonySolver(problem, problem->getN(), 1.0, 2.0, 0.1, 2.0, problem->getN() * 2, 0, with_sa);
+                AntColonySolver* antColonySolver = new AntColonySolver(problem, problem->getN() * 2, 1.0, 2.0, 0.1, 2.0, problem->getN() * 2, 0, with_sa);
                 antColonySolver->solve();
 
                 std::chrono::steady_clock::time_point end = std::chrono::high_resolution_clock::now();

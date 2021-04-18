@@ -53,6 +53,11 @@ AntColonySolver::AntColonySolver(Problem* problem, unsigned int num_ants, double
         }
     }
 
+    generation_results.resize(num_ants);
+//    for (int i = 0; i < num_ants; i++) {
+//        generation_results[i] = 0.0;
+//    }
+
     // initialize simulated annealing if enabled
     this->with_sa = with_sa;
     if (with_sa) {
@@ -138,6 +143,7 @@ void AntColonySolver::solve() {
                 current_solution.push_back(ants_paths[j][0]);
 
                 current_length += costs[ants_paths[j][ants_paths[j].size() - 1]][ants_paths[j][0]];
+                generation_results[j] = current_length;
 
 //                cout << "start from: ";
 //                for (int l = 0; l < ants_paths[j].size(); l++) {
@@ -145,6 +151,14 @@ void AntColonySolver::solve() {
 //                }
 //                cout << endl;
 
+                if (current_length < min_length) {
+                    min_length = current_length;
+                    solution = current_solution;
+                    cout << "new min length " << min_length << endl;
+                }
+            }
+
+            for (int j = 0; j < num_ants; j++) {
                 if (temperature >= temperature_min && with_sa) {
                     for (int k = 0; k < num_sa_iterations; k++) {
                         double new_sa_length = 0.0;
@@ -173,26 +187,24 @@ void AntColonySolver::solve() {
                             solution = new_sa_solution;
                             cout << "new min length with sa " << min_length << endl;
                         }
-                        double difference_sa_curr = new_sa_length - current_length;
+                        double difference_sa_curr = new_sa_length - generation_results[j];
                         double prob_sa_acceptance = exp(-difference_sa_curr / temperature);
                         double rand_p = (double) rand() / RAND_MAX;
-                        if (difference_sa_curr < 0.0 || rand_p < prob_sa_acceptance) {
+                        if (rand_p < prob_sa_acceptance) {
                             new_sa_solution.pop_back();
-                            ants_paths.push_back(new_sa_solution);
-                            num_ants++;
+                            if (k == 0) {
+                                ants_paths.push_back(ants_paths[j]);
+                                generation_results.push_back(generation_results[j]);
+                                num_ants++;
+                            }
+                            ants_paths[j] = new_sa_solution;
+                            generation_results[j] = new_sa_length;
                         }
                     }
+                    temperature = temperature * temperature_max;
                 }
-                if (current_length < min_length) {
-                    min_length = current_length;
-                    solution = current_solution;
-                    cout << "new min length " << min_length << endl;
-                }
-
-
             }
 
-            temperature = temperature * temperature_max;
 
             // calculating new pheromone levels
             vector<vector<double>> delta_tau_table;
@@ -216,7 +228,7 @@ void AntColonySolver::solve() {
                 }
             }
 
-            alpha = (double)rand()/RAND_MAX * 2.0;
+//            alpha = (double)rand()/RAND_MAX * 2.0;
 //            cout << "alpha " << alpha << endl;
         }
         problem->setMinCost(min_length);
