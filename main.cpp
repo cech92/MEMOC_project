@@ -19,9 +19,12 @@ using namespace std;
 int main(int argc, char const *argv[]) {
     try {
         int mode = -1;
+        string mode_str = "";
         while (mode != 0 && mode != 1) {
             cout << "Select method (0: CPLEX, 1: Ant colony): ";
-            cin >> mode;
+            cin >> mode_str;
+            if (mode_str == "0" || mode_str == "1")
+                mode = stoi(mode_str);
         }
 
         srand((unsigned int)time(NULL));
@@ -47,9 +50,16 @@ int main(int argc, char const *argv[]) {
             Problem* problem = new Problem(filePath);
 
             if (mode == 1) {
+                bool with_sa = true;
+                string with_sa_str = "";
+                cout << "Select if use Simulated Annealing (0: No, 1: Yes), default 1: ";
+                cin >> with_sa_str;
+                if (with_sa_str == "0")
+                    with_sa = false;
+
                 std::chrono::steady_clock::time_point start = std::chrono::high_resolution_clock::now();
 
-                AntColonySolver* antColonySolver = new AntColonySolver(problem, problem->getN() * 2, 1.0, 2.0, 0.1, 2.0, problem->getN() * 2, 0);
+                AntColonySolver* antColonySolver = new AntColonySolver(problem, problem->getN() * 2, 1.0, 2.0, 0.1, 2.0, problem->getN() * 2, 0, with_sa);
                 antColonySolver->solve();
 
                 std::chrono::steady_clock::time_point end = std::chrono::high_resolution_clock::now();
@@ -66,7 +76,7 @@ int main(int argc, char const *argv[]) {
                 cout << "Time taken by function: " << duration.count() << " milliseconds" << endl << endl;
 
                 delete antColonySolver;
-                break;
+//                break;
             } else {
                 std::chrono::steady_clock::time_point start = std::chrono::high_resolution_clock::now();
 
@@ -87,7 +97,6 @@ int main(int argc, char const *argv[]) {
                 cout << "Time taken by function: " << duration.count() << " milliseconds" << endl;
 
                 delete cplexSolver;
-                break;
             }
 
             delete problem;

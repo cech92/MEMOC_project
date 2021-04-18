@@ -25,8 +25,13 @@ private:
 
     double min_length;
     vector<int> solution;
+
+    //simulated annealing
+    double temperature;
+    double temperature_min;
+    unsigned int num_sa_iterations;
 public:
-    AntColonySolver(Problem* problem, unsigned int num_ants, double alpha, double beta, double rho, double q, unsigned int max_iterations, unsigned int max_execution_time);
+    AntColonySolver(Problem* problem, unsigned int num_ants, double alpha, double beta, double rho, double q, unsigned int max_iterations, unsigned int max_execution_time, bool with_sa);
     void solve();
 };
 

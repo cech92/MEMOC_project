@@ -178,8 +178,8 @@ void CPLEXSolver::solve() {
     CHECKED_CPX_CALL(CPXgetx, env, lp, &vars[0], fromIdx, toIdx);
 
     vector<int> solution;
-    findSolution(solution, vars, 0);
-    problem->setSolution(solution);
+//    findSolution(solution, vars, 0);
+//    problem->setSolution(solution);
 
     CHECKED_CPX_CALL(CPXsolwrite, env, lp, "solution.sol");
 }
