@@ -27,7 +27,9 @@ private:
     vector<int> solution;
 
     //simulated annealing
+    bool with_sa;
     double temperature;
+    double temperature_max;
     double temperature_min;
     unsigned int num_sa_iterations;
 public:

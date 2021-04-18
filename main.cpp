@@ -19,12 +19,23 @@ using namespace std;
 int main(int argc, char const *argv[]) {
     try {
         int mode = -1;
+        bool with_sa = true;
         string mode_str = "";
+        string with_sa_str = "";
         while (mode != 0 && mode != 1) {
-            cout << "Select method (0: CPLEX, 1: Ant colony): ";
+            cout << "Select method (0: CPLEX, 1: Ant colony), default 0: ";
             cin >> mode_str;
-            if (mode_str == "0" || mode_str == "1")
+            if (mode_str == "1") {
                 mode = stoi(mode_str);
+                if (mode == 1) {
+                    cout << "Select if use Simulated Annealing (0: No, 1: Yes), default 1: ";
+                    cin >> with_sa_str;
+                    if (with_sa_str == "0")
+                        with_sa = false;
+                }
+            } else {
+                mode = 0;
+            }
         }
 
         srand((unsigned int)time(NULL));
@@ -50,16 +61,9 @@ int main(int argc, char const *argv[]) {
             Problem* problem = new Problem(filePath);
 
             if (mode == 1) {
-                bool with_sa = true;
-                string with_sa_str = "";
-                cout << "Select if use Simulated Annealing (0: No, 1: Yes), default 1: ";
-                cin >> with_sa_str;
-                if (with_sa_str == "0")
-                    with_sa = false;
-
                 std::chrono::steady_clock::time_point start = std::chrono::high_resolution_clock::now();
 
-                AntColonySolver* antColonySolver = new AntColonySolver(problem, problem->getN() * 2, 1.0, 2.0, 0.1, 2.0, problem->getN() * 2, 0, with_sa);
+                AntColonySolver* antColonySolver = new AntColonySolver(problem, problem->getN(), 1.0, 2.0, 0.1, 2.0, problem->getN() * 2, 0, with_sa);
                 antColonySolver->solve();
 
                 std::chrono::steady_clock::time_point end = std::chrono::high_resolution_clock::now();
@@ -94,7 +98,7 @@ int main(int argc, char const *argv[]) {
                         cout << ", ";
                 }
                 cout << ")" << endl;
-                cout << "Time taken by function: " << duration.count() << " milliseconds" << endl;
+                cout << "Time taken by function: " << duration.count() << " milliseconds" << endl << endl;
 
                 delete cplexSolver;
             }
