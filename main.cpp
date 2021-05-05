@@ -22,36 +22,44 @@ int main(int argc, char const *argv[]) {
         bool with_sa = true;
         string mode_str = "";
         string with_sa_str = "";
+        string path = "";
         while (mode != 0 && mode != 1) {
-            cout << "Select method (0: CPLEX, 1: Ant colony), default 0: ";
-            cin >> mode_str;
+            cout << "Select method (0: CPLEX, 1: Ant colony) [default = 0]: ";
+            std::getline(std::cin, mode_str);
             if (mode_str == "1") {
                 mode = stoi(mode_str);
                 if (mode == 1) {
-                    cout << "Apply Simulated Annealing (0: No, 1: Yes), default 1? ";
-                    cin >> with_sa_str;
+                    cout << "Apply Simulated Annealing (0: No, 1: Yes) [default = 1]? ";
+                    std::getline(std::cin, with_sa_str);
                     if (with_sa_str == "0")
                         with_sa = false;
                 }
             } else {
                 mode = 0;
             }
+            cout << "Insert the name of the file inside the inputs folder all leave it blank for try all the instances: ";
+            std::getline(std::cin, path);
+            cout << endl;
         }
 
         srand((unsigned int)time(NULL));
-        std::string path = "/inputs";
+        std::string inputs_folder = "/inputs";
         DIR *dr;
         struct dirent *dp;
         dr = opendir("./inputs");
         std::vector <std::string> filesOrdered;
-        if (dr) {
-            while ((dp = readdir(dr)) != NULL) {
-                if (std::string(dp->d_name).find("distances") != std::string::npos) {
-                    filesOrdered.push_back(std::string(dp->d_name));
+        if (path != "") {
+            filesOrdered.push_back(path);
+        } else {
+            if (dr) {
+                while ((dp = readdir(dr)) != NULL) {
+                    if (std::string(dp->d_name).find("distances") != std::string::npos) {
+                        filesOrdered.push_back(std::string(dp->d_name));
+                    }
                 }
+                closedir(dr);
+                std::sort(filesOrdered.begin(), filesOrdered.end());
             }
-            closedir(dr);
-            std::sort(filesOrdered.begin(), filesOrdered.end());
         }
         for(vector<string>::iterator it = std::begin(filesOrdered); it != std::end(filesOrdered); ++it) {
             std::string filePath = *it;
