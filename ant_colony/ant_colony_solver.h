@@ -12,6 +12,7 @@ private:
 
     unsigned int max_iterations;
     unsigned int max_execution_time;
+    time_t stop_time;
 
     double alpha;
     double beta;

@@ -22,6 +22,7 @@ AntColonySolver::AntColonySolver(Problem* problem, unsigned int num_ants, double
     this->max_execution_time = max_execution_time;
 
     this->min_length = DBL_MAX;
+    this->stop_time = time(NULL) + this->max_execution_time;
 
     // initialize the pheromone matrix (tau) with the same pheromone quantity for each edge
     pheromones_matrix.resize(num_cities);
@@ -70,9 +71,12 @@ AntColonySolver::AntColonySolver(Problem* problem, unsigned int num_ants, double
 
 void AntColonySolver::solve() {
     vector<vector<double>> probability_matrix;
-    if (max_iterations > 0) {
-        for (int i = 0; i < max_iterations; ++i) {
 
+    if (this->max_iterations > 0) {
+        for (int i = 0; i < max_iterations; ++i) {
+            if (time(NULL) > this->stop_time) {
+                break;
+            }
 //            probability_matrix.resize(num_cities);
 //            for (int j = 0; j < num_cities; ++j) {
 //                probability_matrix[j].resize(num_cities);

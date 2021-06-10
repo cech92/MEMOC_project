@@ -7,10 +7,10 @@ def main(argv):
     N = int(argv[1])
 
     test_n = 1
-    path = "inputs/random_size_" + str(N) + "_distances_n_" + str(test_n) + ".txt"
+    path = "inputs/input_size_" + str(N) + "_n_" + str(test_n) + ".txt"
     while os.path.exists(path):
         test_n += 1
-        path = "inputs/random_size_" + str(N) + "_distances_n_" + str(test_n) + ".txt"
+        path = "inputs/input_size_" + str(N) + "_n_" + str(test_n) + ".txt"
     outputFile = open(path, "w")
     outputFile.write(str(N) + "\n")
     i = 0

@@ -71,12 +71,11 @@ int main(int argc, char const *argv[]) {
             std::string outputPath = "outputs/" + filePath.substr(0, filePath.size() - 4) + ".sol";
             std::cout << filePath << std::endl;
 
+            std::chrono::steady_clock::time_point start = std::chrono::high_resolution_clock::now();
             Problem* problem = new Problem(filePath);
 
             if (mode == 1) {
-                std::chrono::steady_clock::time_point start = std::chrono::high_resolution_clock::now();
-
-                AntColonySolver* antColonySolver = new AntColonySolver(problem, problem->getN(), 1.0, 2.0, 0.1, 2.0, problem->getN(), 0, with_sa);
+                AntColonySolver* antColonySolver = new AntColonySolver(problem, problem->getN(), 1.0, 2.0, 0.1, 2.0, problem->getN(), stoi(time_limit), with_sa);
                 antColonySolver->solve();
 
                 std::chrono::steady_clock::time_point end = std::chrono::high_resolution_clock::now();
@@ -95,8 +94,6 @@ int main(int argc, char const *argv[]) {
                 delete antColonySolver;
 //                break;
             } else {
-                std::chrono::steady_clock::time_point start = std::chrono::high_resolution_clock::now();
-
                 CPLEXSolver* cplexSolver = new CPLEXSolver(problem, time_limit);
                 cplexSolver->solve();
 
