@@ -4,8 +4,9 @@
 
 using namespace std;
 
-CPLEXSolver::CPLEXSolver(Problem* problem) {
+CPLEXSolver::CPLEXSolver(Problem* problem, string time_limit) {
     this->problem = problem;
+    this->time_limit = stod(time_limit);
 
     this->env = CPXopenCPLEX(&status);
     if (status){
@@ -21,6 +22,7 @@ CPLEXSolver::CPLEXSolver(Problem* problem) {
         if (trailer >= 0) errmsg[trailer] = '\0';
         throw std::runtime_error(std::string(__FILE__) + ":" + STRINGIZE(__LINE__) + ": " + errmsg);
     }
+    CPXsetdblparam(env, CPX_PARAM_TILIM, this->time_limit);
 
     vector<vector<double>> costs = problem->getCosts();
     vector<int> indexes = problem->getIndexes();
@@ -46,6 +48,7 @@ CPLEXSolver::CPLEXSolver(Problem* problem) {
             double ub = 1.0;
             snprintf(name, NAME_SIZE, "y_%d_%d", indexes[i], indexes[j]);
             char* y_name = (char*) &name[0];
+
             CHECKED_CPX_CALL(CPXnewcols, env, lp, 1, &obj, &lb, &ub, &y_type, &y_name);
             map_y[i][j] = current_y_var_position;
             ++current_y_var_position;
@@ -72,6 +75,7 @@ CPLEXSolver::CPLEXSolver(Problem* problem) {
             double ub = CPX_INFBOUND;
             snprintf(name, NAME_SIZE, "x_%d_%d", indexes[i], indexes[j]);
             char* x_name = (char*) &name[0];
+
             CHECKED_CPX_CALL(CPXnewcols, env, lp, 1, &obj, &lb, &ub, &x_type, &x_name);
             map_x[i][j] = current_x_var_position;
             ++current_x_var_position;
@@ -92,6 +96,7 @@ CPLEXSolver::CPLEXSolver(Problem* problem) {
         snprintf(name, NAME_SIZE, "flow_sent_%d", i);
         char* cname = (char*)(&name[0]);
         int matbeg = 0;
+
         CHECKED_CPX_CALL(CPXaddrows, env, lp, 0, 1, idx.size(), &rhs, &sense, &matbeg, &idx[0], &coef[0], NULL, &cname);
         /// status = CPXaddrows ( env, lp, colcnt, rowcnt, nzcnt     , rhs  , sense , rmatbeg, rmatind, rmatval , newcolname, newrowname);
     }
@@ -110,6 +115,7 @@ CPLEXSolver::CPLEXSolver(Problem* problem) {
         snprintf(name, NAME_SIZE, "flow_received_%d", j);
         char* cname = (char*)(&name[0]);
         int matbeg = 0;
+
         CHECKED_CPX_CALL(CPXaddrows, env, lp, 0, 1, idx.size(), &rhs, &sense, &matbeg, &idx[0], &coef[0], NULL, &cname);
         /// status = CPXaddrows ( env, lp, colcnt, rowcnt, nzcnt     , rhs  , sense , rmatbeg, rmatind, rmatval , newcolname, newrowname);
     }
@@ -135,8 +141,8 @@ CPLEXSolver::CPLEXSolver(Problem* problem) {
         double rhs = 1.0;
         snprintf(name, NAME_SIZE, "flow_diff_%d", k);
         char* cname = (char*)(&name[0]);
-
         int matbeg = 0;
+
         CHECKED_CPX_CALL(CPXaddrows, env, lp, 0, 1, idx.size(), &rhs, &sense, &matbeg, &idx[0], &coef[0], NULL, &cname);
     }
 
@@ -156,6 +162,7 @@ CPLEXSolver::CPLEXSolver(Problem* problem) {
             snprintf(name, NAME_SIZE, "att_%d_%d", i, j);
             char* cname = &name[0];
             int matbeg = 0;
+
             CHECKED_CPX_CALL(CPXaddrows, env, lp, 0, 1, 2, &rhs, &sense, &matbeg, &idx[0], &coef[0], NULL, &cname);
         }
     }
@@ -175,6 +182,7 @@ void CPLEXSolver::solve() {
     vars.resize(num);
     int fromIdx = 0;
     int toIdx = num - 1;
+
     CHECKED_CPX_CALL(CPXgetx, env, lp, &vars[0], fromIdx, toIdx);
 
     vector<int> solution;

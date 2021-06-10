@@ -16,12 +16,13 @@ private:
     char name[NAME_SIZE];
 
     Problem* problem;
+    double time_limit;
     vector<vector<int> > map_y; // 1 if arc from i to j used, 0 otherwise, ∀ (i, j) ∈ A
     vector<vector<int> > map_x; // amount of the flow shipped from i to j, ∀ (i, j) ∈ A
     // amount of the flow shipped from i to j, ∀ (i, j) ∈ A
     int first_index = 0;
 public:
-    CPLEXSolver(Problem* problem);
+    CPLEXSolver(Problem* problem, string time_limit);
     void solve();
     void findSolution(vector<int>& solution, vector<double>vars, int start);
 };

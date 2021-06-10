@@ -23,6 +23,7 @@ int main(int argc, char const *argv[]) {
         string mode_str = "";
         string with_sa_str = "";
         string path = "";
+        string time_limit = "";
         while (mode != 0 && mode != 1) {
             cout << "Select method (0: CPLEX, 1: Ant colony) [default = 0]: ";
             std::getline(std::cin, mode_str);
@@ -37,6 +38,10 @@ int main(int argc, char const *argv[]) {
             } else {
                 mode = 0;
             }
+            cout << "Insert a time limit in seconds (0: no time limit) [default = 300]: ";
+            std::getline(std::cin, time_limit);
+            if (time_limit.empty())
+                time_limit = "300";
             cout << "Insert the name of the file inside the inputs folder all leave it blank for try all the instances: ";
             std::getline(std::cin, path);
             cout << endl;
@@ -92,7 +97,7 @@ int main(int argc, char const *argv[]) {
             } else {
                 std::chrono::steady_clock::time_point start = std::chrono::high_resolution_clock::now();
 
-                CPLEXSolver* cplexSolver = new CPLEXSolver(problem);
+                CPLEXSolver* cplexSolver = new CPLEXSolver(problem, time_limit);
                 cplexSolver->solve();
 
                 std::chrono::steady_clock::time_point end = std::chrono::high_resolution_clock::now();
