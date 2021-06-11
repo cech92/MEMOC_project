@@ -13,6 +13,7 @@
 #include "cpxmacro.h"
 #include "cplex/cplex_solver.h"
 #include "ant_colony/ant_colony_solver.h"
+#include "simulated_annealing/simulated_annealing_solver.h"
 
 using namespace std;
 
@@ -24,8 +25,8 @@ int main(int argc, char const *argv[]) {
         string with_sa_str = "";
         string path = "";
         string time_limit = "";
-        while (mode != 0 && mode != 1) {
-            cout << "Select method (0: CPLEX, 1: Ant colony) [default = 0]: ";
+        while (mode != 0 && mode != 1 && mode != 2) {
+            cout << "Select method (0: CPLEX, 1: Ant colony, 2: Simulated Annealing) [default = 0]: ";
             std::getline(std::cin, mode_str);
             if (mode_str == "1") {
                 mode = stoi(mode_str);
@@ -35,6 +36,8 @@ int main(int argc, char const *argv[]) {
                     if (with_sa_str == "0")
                         with_sa = false;
                 }
+            } else if (mode_str == "2") {
+                mode = stoi(mode_str);
             } else {
                 mode = 0;
             }
@@ -92,10 +95,9 @@ int main(int argc, char const *argv[]) {
                 cout << "Time taken by function: " << duration.count() << " milliseconds" << endl << endl;
 
                 delete antColonySolver;
-//                break;
-            } else {
-                CPLEXSolver* cplexSolver = new CPLEXSolver(problem, time_limit);
-                cplexSolver->solve();
+            } else if (mode == 2) {
+                SimulatedAnnealingSolver* simulatedAnnealingSolver = new SimulatedAnnealingSolver(problem, problem->getN() * 10, stoi(time_limit));
+                simulatedAnnealingSolver->solve();
 
                 std::chrono::steady_clock::time_point end = std::chrono::high_resolution_clock::now();
                 auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
@@ -110,8 +112,26 @@ int main(int argc, char const *argv[]) {
                 cout << ")" << endl;
                 cout << "Time taken by function: " << duration.count() << " milliseconds" << endl << endl;
 
-                delete cplexSolver;
-            }
+                delete simulatedAnnealingSolver;
+            } else {
+                    CPLEXSolver* cplexSolver = new CPLEXSolver(problem, time_limit);
+                    cplexSolver->solve();
+
+                    std::chrono::steady_clock::time_point end = std::chrono::high_resolution_clock::now();
+                    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+
+                    cout << "Min cost found is: " << problem->getMinCost() << " (";
+                    vector<int> solution = problem->getSolution();
+                    for (int i = 0; i < solution.size(); i++) {
+                        cout << solution[i];
+                        if (i < solution.size() -1)
+                            cout << ", ";
+                    }
+                    cout << ")" << endl;
+                    cout << "Time taken by function: " << duration.count() << " milliseconds" << endl << endl;
+
+                    delete cplexSolver;
+                }
 
             delete problem;
         }
