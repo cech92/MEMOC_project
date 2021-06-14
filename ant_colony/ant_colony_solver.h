@@ -24,6 +24,8 @@ private:
     vector<vector<int>> ants_paths;
     vector<vector<double>> ants_distances;
     vector<double> generation_results;
+    double best_generation_result;
+    int best_generation_index;
 
     double min_length;
     vector<int> solution;

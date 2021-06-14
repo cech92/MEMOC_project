@@ -99,7 +99,6 @@ void SimulatedAnnealingSolver::solve() {
                 }
             }
         }
-
         temperature = temperature * temperature_max;
     }
     problem->setMinCost(min_length);
