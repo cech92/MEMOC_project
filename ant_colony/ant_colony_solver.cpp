@@ -22,7 +22,7 @@ AntColonySolver::AntColonySolver(Problem* problem, unsigned int num_ants, double
     this->max_execution_time = max_execution_time;
 
     this->min_length = DBL_MAX;
-    this->stop_time = time(NULL) + this->max_execution_time;
+    this->stop_time = std::chrono::steady_clock::now() + std::chrono::seconds(this->max_execution_time);
 
     // initialize the pheromone matrix (tau) with the same pheromone quantity for each edge
     pheromones_matrix.resize(num_cities);
@@ -63,7 +63,7 @@ AntColonySolver::AntColonySolver(Problem* problem, unsigned int num_ants, double
     this->with_sa = with_sa;
     if (with_sa) {
         this->temperature_max = 0.995;
-        this->temperature_min = 0.000001;
+        this->temperature_min = 0.00001;
         this->temperature = temperature_max;
         this->num_sa_iterations = 10 * num_cities;
     }
@@ -74,16 +74,9 @@ void AntColonySolver::solve() {
 
     if (this->max_iterations > 0) {
         for (int i = 0; i < max_iterations; ++i) {
-            if (time(NULL) > this->stop_time) {
+            if (std::chrono::steady_clock::now() >= this->stop_time) {
                 break;
             }
-//            probability_matrix.resize(num_cities);
-//            for (int j = 0; j < num_cities; ++j) {
-//                probability_matrix[j].resize(num_cities);
-//                for (int k = 0; k < num_cities; ++k) {
-//                    probability_matrix[j][k] = pow(pheromones_matrix[j][k], alpha) * pow(visibility_matrix[j][k], beta);
-//                }
-//            }
 
             // loop over ants
             for (int j = 0; j < num_ants; j++) {
@@ -123,7 +116,6 @@ void AntColonySolver::solve() {
                         prob_tot += probability_matrix[ants_paths[j][count]][allow_list[k]];
                         if (random <= prob_tot) {
                             next_city = allow_list[k];
-//                            cout << "next city " << next_city << " | ";
                             element_to_remove = k;
                             break;
                         }
@@ -138,8 +130,6 @@ void AntColonySolver::solve() {
                 vector<int> current_solution;
                 current_solution.reserve(num_cities + 1);
                 for (int k = 0; k < ants_paths[j].size() - 1; k++) {
-//                    cout << "From " << ants_paths[j][k] << " to " << ants_paths[j][k + 1] << " "
-//                         << costs[ants_paths[j][k]][ants_paths[j][k + 1]] << endl;
                     current_length += costs[ants_paths[j][k]][ants_paths[j][k + 1]];
                     current_solution.push_back(ants_paths[j][k]);
                 }
@@ -149,20 +139,13 @@ void AntColonySolver::solve() {
                 current_length += costs[ants_paths[j][ants_paths[j].size() - 1]][ants_paths[j][0]];
                 generation_results[j] = current_length;
 
-//                cout << "start from: ";
-//                for (int l = 0; l < ants_paths[j].size(); l++) {
-//                    cout << ants_paths[j][l] << " ";
-//                }
-//                cout << endl;
-
                 if (current_length < min_length) {
                     min_length = current_length;
                     solution = current_solution;
-                    cout << "new min length " << j << " " << min_length << endl;
                 }
             }
 
-            if (temperature >= temperature_min && with_sa) {
+            if (temperature >= temperature_min && with_sa && std::chrono::steady_clock::now() < this->stop_time) {
                 for (int j = 0; j < num_ants; j++) {
                     for (int k = 0; k < num_sa_iterations; k++) {
                         double new_sa_length = 0.0;
@@ -173,23 +156,18 @@ void AntColonySolver::solve() {
                         while (index1 == index2) {
                             index2 = rand() % num_cities;
                         }
-                        //                    cout << index1 << " " << index2<<endl;
+
                         int temp = new_sa_solution[index1];
                         new_sa_solution[index1] = new_sa_solution[index2];
                         new_sa_solution[index2] = temp;
                         new_sa_solution.push_back(new_sa_solution[0]);
                         for (int l = 0; l < new_sa_solution.size() - 1; l++) {
-                            //                        cout << new_sa_solution[l] << " ";
                             new_sa_length += costs[new_sa_solution[l]][new_sa_solution[l + 1]];
                         }
-                        //                    cout << endl;
-                        //                    cout << endl;
-                        //                    cout << "curr, new : " << current_length << " | " << new_sa_length << endl;
 
                         if (new_sa_length < min_length) {
                             min_length = new_sa_length;
                             solution = new_sa_solution;
-                            cout << "new min length with sa " << j << " " << min_length << endl;
                         }
                         double difference_sa_curr = new_sa_length - generation_results[j];
                         double prob_sa_acceptance = exp(-difference_sa_curr / temperature);
@@ -200,15 +178,13 @@ void AntColonySolver::solve() {
                                 ants_paths.push_back(ants_paths[j]);
                                 generation_results.push_back(generation_results[j]);
                                 num_ants++;
-                                cout << "num ants " << num_ants << " ";
                             }
                             ants_paths[j] = new_sa_solution;
                             generation_results[j] = new_sa_length;
                         }
-//                        temperature = temperature * temperature_max;
                     }
-                    temperature = temperature * temperature_max;
                 }
+                temperature = temperature * temperature_max;
             }
 
 
@@ -223,9 +199,9 @@ void AntColonySolver::solve() {
             }
             for (int j = 0; j < ants_paths.size(); j++) {
                 for (int k = 0; k < ants_paths[j].size() - 1; k++) {
-                    delta_tau_table[ants_paths[j][k]][ants_paths[j][k+1]] += 1 / costs[ants_paths[j][k]][ants_paths[j][k + 1]];
+                    delta_tau_table[ants_paths[j][k]][ants_paths[j][k+1]] += this->q / costs[ants_paths[j][k]][ants_paths[j][k + 1]];
                 }
-                delta_tau_table[ants_paths[j][num_cities - 1]][ants_paths[j][0]] += 1 / costs[ants_paths[j][ants_paths[j].size() - 1]][ants_paths[j][0]];
+                delta_tau_table[ants_paths[j][num_cities - 1]][ants_paths[j][0]] += this->q / costs[ants_paths[j][ants_paths[j].size() - 1]][ants_paths[j][0]];
             }
 
             for (int j = 0; j < num_cities; j++) {
@@ -233,9 +209,6 @@ void AntColonySolver::solve() {
                     pheromones_matrix[j][k] = (1 - rho) * pheromones_matrix[j][k] + delta_tau_table[j][k];
                 }
             }
-
-            alpha = (double)rand()/RAND_MAX * 2.0;
-//            cout << "alpha " << alpha << endl;
         }
         problem->setMinCost(min_length);
         problem->setSolution(solution);

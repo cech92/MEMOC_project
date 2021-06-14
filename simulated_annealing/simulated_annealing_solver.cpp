@@ -17,7 +17,7 @@ SimulatedAnnealingSolver::SimulatedAnnealingSolver(Problem* problem, unsigned in
     this->max_execution_time = max_execution_time;
 
     this->min_length = DBL_MAX;
-    this->stop_time = time(NULL) + this->max_execution_time;
+    this->stop_time = std::chrono::steady_clock::now() + std::chrono::seconds(this->max_execution_time);
 
     this->temperature_max = 0.995;
     this->temperature_min = 1e-08;
@@ -55,9 +55,9 @@ void SimulatedAnnealingSolver::solve() {
     vector<int> current_solution = best_solution;
     double current_length = min_length;
     int loops = 0;
-    while (true) {
+    while (std::chrono::steady_clock::now() < this->stop_time) {
         for (int i = 0; i < max_iterations; ++i) {
-            if (time(NULL) > this->stop_time) {
+            if (std::chrono::steady_clock::now() >= this->stop_time) {
                 break;
             }
 
@@ -88,7 +88,6 @@ void SimulatedAnnealingSolver::solve() {
                 if (new_sa_length < min_length) {
                     min_length = new_sa_length;
                     best_solution = new_sa_solution;
-                    cout << "new min length with sa " << min_length << " " << loops << endl;
                 }
             } else {
                 double prob_sa_acceptance = exp(-abs(difference_sa_curr) / temperature);
@@ -102,12 +101,7 @@ void SimulatedAnnealingSolver::solve() {
         }
 
         temperature = temperature * temperature_max;
-        if (temperature < temperature_min) {
-            cout << "No more temp left"<<endl;
-            break;
-        }
     }
-    cout << "loops " <<loops << endl;
     problem->setMinCost(min_length);
     problem->setSolution(best_solution);
 }

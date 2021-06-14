@@ -12,7 +12,7 @@ private:
 
     unsigned int max_iterations;
     unsigned int max_execution_time;
-    time_t stop_time;
+    std::chrono::steady_clock::time_point stop_time;
 
     double alpha;
     double beta;
