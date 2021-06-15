@@ -1,6 +1,7 @@
 #ifndef SIMULATED_ANNEALING_SOLVER_H
 #define SIMULATED_ANNEALING_SOLVER_H
 
+#include <chrono>
 #include "../problem.h"
 
 class SimulatedAnnealingSolver {
@@ -11,7 +12,7 @@ private:
 
     unsigned int max_iterations;
     unsigned int max_execution_time;
-    std::chrono::steady_clock::time_point stop_time;
+    chrono::steady_clock::time_point stop_time;
 
 //    vector<double> generation_results;
 

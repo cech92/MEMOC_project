@@ -1,14 +1,11 @@
-#include <cstdio>
 #include <iostream>
 #include <fstream>
-#include <filesystem>
 #include <sstream>
 #include <string>
 #include <vector>
+#include <algorithm>
 #include <dirent.h>
 #include <time.h>
-#include <sys/types.h>
-#include <libgen.h>
 #include <math.h>
 #include "cpxmacro.h"
 #include "cplex/cplex_solver.h"
@@ -75,13 +72,13 @@ int main(int argc, char const *argv[]) {
             std::cout << filePath << std::endl;
 
             Problem* problem = new Problem(filePath);
-            std::chrono::steady_clock::time_point start = std::chrono::high_resolution_clock::now();
+            auto start = std::chrono::high_resolution_clock::now();
 
             if (mode == 1) {
-                AntColonySolver* antColonySolver = new AntColonySolver(problem, problem->getN()*2, 1.0, 2.0, 0.1, 1.0, problem->getN()*4, stoi(time_limit), with_sa);
+                AntColonySolver* antColonySolver = new AntColonySolver(problem, problem->getN()*2, 1.0, 2.0, 0.1, 1.0, problem->getN()*10, stoi(time_limit), with_sa);
                 antColonySolver->solve();
 
-                std::chrono::steady_clock::time_point end = std::chrono::high_resolution_clock::now();
+                auto end = std::chrono::high_resolution_clock::now();
                 auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
 
                 cout << "Min cost found is: " << problem->getMinCost() << " (";
@@ -99,7 +96,7 @@ int main(int argc, char const *argv[]) {
                 SimulatedAnnealingSolver* simulatedAnnealingSolver = new SimulatedAnnealingSolver(problem, problem->getN() * 10, stoi(time_limit));
                 simulatedAnnealingSolver->solve();
 
-                std::chrono::steady_clock::time_point end = std::chrono::high_resolution_clock::now();
+                auto end = std::chrono::high_resolution_clock::now();
                 auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
 
                 cout << "Min cost found is: " << problem->getMinCost() << " (";
@@ -117,7 +114,7 @@ int main(int argc, char const *argv[]) {
                     CPLEXSolver* cplexSolver = new CPLEXSolver(problem, time_limit);
                     cplexSolver->solve();
 
-                    std::chrono::steady_clock::time_point end = std::chrono::high_resolution_clock::now();
+                    auto end = std::chrono::high_resolution_clock::now();
                     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
 
                     cout << "Min cost found is: " << problem->getMinCost() << " (";

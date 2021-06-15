@@ -1,6 +1,7 @@
 #ifndef ANT_COLONY_SOLVER_H
 #define ANT_COLONY_SOLVER_H
 
+#include <chrono>
 #include "../problem.h"
 
 class AntColonySolver {
@@ -12,7 +13,7 @@ private:
 
     unsigned int max_iterations;
     unsigned int max_execution_time;
-    std::chrono::steady_clock::time_point stop_time;
+    chrono::steady_clock::time_point stop_time;
 
     double alpha;
     double beta;

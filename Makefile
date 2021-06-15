@@ -3,6 +3,13 @@ CPPFLAGS = -g -Wall -O2
 CCOPTS = -std=c++11 -c -g -O0 -Wall -Wno-deprecated -Wunused-variable -Wno-sign-compare
 LDFLAGS =
 
+# labTA paths
+#CPX_BASE    = /server1/1/2012/lceccon
+#CPX_INCDIR  = $(CPX_BASE)/cplex/include
+#CPX_LIBDIR  = $(CPX_BASE)/cplex/lib/x86-64_linux/static_pic
+#CPX_LDFLAGS = -lcplex -lm -pthread -ldl
+
+# personal macOS paths
 CPX_BASE    = /Applications/CPLEX_Studio1210
 CPX_INCDIR  = $(CPX_BASE)/cplex/include
 CPX_LIBDIR  = $(CPX_BASE)/cplex/lib/x86-64_osx/static_pic

@@ -1,7 +1,6 @@
 #include <iostream>
 #include <math.h>
 #include <float.h>
-#include <functional>
 #include <numeric>
 #include <unordered_set>
 #include "ant_colony_solver.h"
@@ -65,7 +64,7 @@ AntColonySolver::AntColonySolver(Problem* problem, unsigned int num_ants, double
         this->temperature_max = 0.995;
         this->temperature_min = 1e-08;
         this->temperature = temperature_max;
-        this->num_sa_iterations = num_cities;
+        this->num_sa_iterations = 4 * num_cities;
     }
 }
 
@@ -172,11 +171,6 @@ void AntColonySolver::solve() {
                     double difference_sa_curr = new_sa_length - generation_results[best_generation_index];
                     if (difference_sa_curr < 0.0) {
                         new_sa_solution.pop_back();
-//                            if (k == 0) {
-//                                ants_paths.push_back(ants_paths[j]);
-//                                generation_results.push_back(generation_results[j]);
-//                                num_ants++;
-//                            }
                         ants_paths[best_generation_index] = new_sa_solution;
                         generation_results[best_generation_index] = new_sa_length;
                         if (new_sa_length < min_length) {

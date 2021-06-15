@@ -1,7 +1,6 @@
 #include <iostream>
 #include <math.h>
 #include <float.h>
-#include <functional>
 #include <numeric>
 #include <unordered_set>
 #include "simulated_annealing_solver.h"
