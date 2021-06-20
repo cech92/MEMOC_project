@@ -38,11 +38,11 @@ int main(int argc, char const *argv[]) {
             } else {
                 mode = 0;
             }
-            cout << "Insert a time limit in seconds (0: no time limit) [default = 300]: ";
+            cout << "Insert a time limit in seconds [default = 300]: ";
             std::getline(std::cin, time_limit);
             if (time_limit.empty())
                 time_limit = "300";
-            cout << "Insert the name of the file inside the inputs folder all leave it blank for try all the instances: ";
+            cout << "Insert the name of the file inside the inputs folder or leave it blank to test all the instances: ";
             std::getline(std::cin, path);
             cout << endl;
         }
@@ -58,7 +58,7 @@ int main(int argc, char const *argv[]) {
         } else {
             if (dr) {
                 while ((dp = readdir(dr)) != NULL) {
-                    if (std::string(dp->d_name).find("distances") != std::string::npos) {
+                    if (std::string(dp->d_name).find(".txt") != std::string::npos) {
                         filesOrdered.push_back(std::string(dp->d_name));
                     }
                 }
@@ -75,7 +75,7 @@ int main(int argc, char const *argv[]) {
             auto start = std::chrono::high_resolution_clock::now();
 
             if (mode == 1) {
-                AntColonySolver* antColonySolver = new AntColonySolver(problem, problem->getN()*2, 1.0, 2.0, 0.1, 1.0, problem->getN()*10, stoi(time_limit), with_sa);
+                AntColonySolver* antColonySolver = new AntColonySolver(problem, problem->getN(), 1.0, 2.0, 0.1, 1.0, problem->getN()*8, stoi(time_limit), with_sa);
                 antColonySolver->solve();
 
                 auto end = std::chrono::high_resolution_clock::now();
@@ -89,11 +89,11 @@ int main(int argc, char const *argv[]) {
                         cout << ", ";
                 }
                 cout << ")" << endl;
-                cout << "Time taken by function: " << duration.count() << " milliseconds" << endl << endl;
+                cout << "Time taken: " << duration.count() << " milliseconds" << endl << endl;
 
                 delete antColonySolver;
             } else if (mode == 2) {
-                SimulatedAnnealingSolver* simulatedAnnealingSolver = new SimulatedAnnealingSolver(problem, problem->getN() * 10, stoi(time_limit));
+                SimulatedAnnealingSolver* simulatedAnnealingSolver = new SimulatedAnnealingSolver(problem, problem->getN() * 20, stoi(time_limit));
                 simulatedAnnealingSolver->solve();
 
                 auto end = std::chrono::high_resolution_clock::now();
@@ -107,7 +107,7 @@ int main(int argc, char const *argv[]) {
                         cout << ", ";
                 }
                 cout << ")" << endl;
-                cout << "Time taken by function: " << duration.count() << " milliseconds" << endl << endl;
+                cout << "Time taken: " << duration.count() << " milliseconds" << endl << endl;
 
                 delete simulatedAnnealingSolver;
             } else {
@@ -125,7 +125,7 @@ int main(int argc, char const *argv[]) {
                             cout << ", ";
                     }
                     cout << ")" << endl;
-                    cout << "Time taken by function: " << duration.count() << " milliseconds" << endl << endl;
+                    cout << "Time taken: " << duration.count() << " milliseconds" << endl << endl;
 
                     delete cplexSolver;
                 }

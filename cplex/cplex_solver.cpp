@@ -37,7 +37,8 @@ CPLEXSolver::CPLEXSolver(Problem* problem, string time_limit) {
         }
     }
 
-    int current_y_var_position = 0;
+    // define yij
+    int current_y_var_position = 0; // starting index
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) {
             if (i == j)
@@ -63,8 +64,9 @@ CPLEXSolver::CPLEXSolver(Problem* problem, string time_limit) {
         }
     }
     const int x_init = CPXgetnumcols(env, lp);
-    int current_x_var_position = x_init;
+    int current_x_var_position = x_init; // set next index counting the total number of vars already created
 
+    // define xij
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) {
             if (i == j)
@@ -82,6 +84,7 @@ CPLEXSolver::CPLEXSolver(Problem* problem, string time_limit) {
         }
     }
 
+    // flow sent from node
     for (int i = 0; i < N; i++) {
         std::vector<int> idx;
         std::vector<double> coef;
@@ -98,9 +101,9 @@ CPLEXSolver::CPLEXSolver(Problem* problem, string time_limit) {
         int matbeg = 0;
 
         CHECKED_CPX_CALL(CPXaddrows, env, lp, 0, 1, idx.size(), &rhs, &sense, &matbeg, &idx[0], &coef[0], NULL, &cname);
-        /// status = CPXaddrows ( env, lp, colcnt, rowcnt, nzcnt     , rhs  , sense , rmatbeg, rmatind, rmatval , newcolname, newrowname);
     }
 
+    // flow received by node
     for (int j = 0; j < N; j++) {
         std::vector<int> idx;
         std::vector<double> coef;
@@ -117,9 +120,9 @@ CPLEXSolver::CPLEXSolver(Problem* problem, string time_limit) {
         int matbeg = 0;
 
         CHECKED_CPX_CALL(CPXaddrows, env, lp, 0, 1, idx.size(), &rhs, &sense, &matbeg, &idx[0], &coef[0], NULL, &cname);
-        /// status = CPXaddrows ( env, lp, colcnt, rowcnt, nzcnt     , rhs  , sense , rmatbeg, rmatind, rmatval , newcolname, newrowname);
     }
 
+    // flow difference between xik and xkj
     for (int k = 0; k < N; k++) {
         if (k == first_index)
             continue;
@@ -131,7 +134,7 @@ CPLEXSolver::CPLEXSolver(Problem* problem, string time_limit) {
             idx.push_back(map_x[i][k]);
             coef.push_back(1);
         }
-        for (int j = 0; j < N; j++) {
+        for (int j = 1; j < N; j++) {
             if (k == j)
                 continue;
             idx.push_back(map_x[k][j]);
@@ -186,8 +189,6 @@ void CPLEXSolver::solve() {
     CHECKED_CPX_CALL(CPXgetx, env, lp, &vars[0], fromIdx, toIdx);
 
     vector<int> solution;
-//    findSolution(solution, vars, 0);
-//    problem->setSolution(solution);
 
     CHECKED_CPX_CALL(CPXsolwrite, env, lp, "solution.sol");
 }

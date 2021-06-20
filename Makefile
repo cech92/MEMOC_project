@@ -5,14 +5,15 @@ LDFLAGS =
 
 # labTA paths
 #CPX_BASE    = /server1/1/2012/lceccon
-#CPX_INCDIR  = $(CPX_BASE)/cplex/include
-#CPX_LIBDIR  = $(CPX_BASE)/cplex/lib/x86-64_linux/static_pic
-#CPX_LDFLAGS = -lcplex -lm -pthread -ldl
+CPX_BASE    = /opt/ibm/ILOG/CPLEX_Studio128
+CPX_INCDIR  = $(CPX_BASE)/cplex/include
+CPX_LIBDIR  = $(CPX_BASE)/cplex/lib/x86-64_linux/static_pic
 
 # personal macOS paths
-CPX_BASE    = /Applications/CPLEX_Studio1210
-CPX_INCDIR  = $(CPX_BASE)/cplex/include
-CPX_LIBDIR  = $(CPX_BASE)/cplex/lib/x86-64_osx/static_pic
+#CPX_BASE    = /Applications/CPLEX_Studio1210
+#CPX_INCDIR  = $(CPX_BASE)/cplex/include
+#CPX_LIBDIR  = $(CPX_BASE)/cplex/lib/x86-64_osx/static_pic
+
 CPX_LDFLAGS = -lcplex -lm -pthread -ldl
 
 OBJ = problem.o cplex_solver.o ant_colony_solver.o simulated_annealing_solver.o main.o
@@ -40,6 +41,6 @@ simulated_annealing_solver.o: simulated_annealing/simulated_annealing_solver.h s
 	$(CC) $(CCOPTS) simulated_annealing/simulated_annealing_solver.cpp
 
 clean:
-		rm -rf $(OBJ) main.out
+		rm -rf $(OBJ) main.out problem.o cplex_solver.o ant_colony_solver.o simulated_annealing_solver.o main.o
 
 .PHONY: clean

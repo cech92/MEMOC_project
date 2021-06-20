@@ -93,6 +93,7 @@ void AntColonySolver::solve() {
                 probability_matrix.resize(num_cities);
                 while (allow_list.size() > 0) {
                     double probability_sum = 0.0;
+                    // calculate probability matrix
                     probability_matrix[ants_paths[j][count]].resize(num_cities);
 
                     for (int k = 0; k < allow_list.size(); ++k) {
@@ -109,6 +110,7 @@ void AntColonySolver::solve() {
 
                     double random = ((double) rand() / (RAND_MAX));
 
+                    // selecting next node to visit
                     double prob_tot = 0.0;
                     int next_city = -1;
                     int element_to_remove = -1;
@@ -138,7 +140,7 @@ void AntColonySolver::solve() {
 
                 current_length += costs[ants_paths[j][ants_paths[j].size() - 1]][ants_paths[j][0]];
                 generation_results[j] = current_length;
-                if (current_length < best_generation_result) {
+                if (current_length < best_generation_result) { // save best generation result for apply the SA later
                     best_generation_result = current_length;
                     best_generation_index = j;
                 }
@@ -160,16 +162,17 @@ void AntColonySolver::solve() {
                         index2 = rand() % num_cities;
                     }
 
+                    // swapping the nodes
                     int temp = new_sa_solution[index1];
                     new_sa_solution[index1] = new_sa_solution[index2];
                     new_sa_solution[index2] = temp;
                     new_sa_solution.push_back(new_sa_solution[0]);
                     for (int l = 0; l < new_sa_solution.size() - 1; l++) {
-                        new_sa_length += costs[new_sa_solution[l]][new_sa_solution[l + 1]];
+                        new_sa_length += costs[new_sa_solution[l]][new_sa_solution[l + 1]]; // calculate new length
                     }
 
                     double difference_sa_curr = new_sa_length - generation_results[best_generation_index];
-                    if (difference_sa_curr < 0.0) {
+                    if (difference_sa_curr < 0.0) { // if new solution is better than the older
                         new_sa_solution.pop_back();
                         ants_paths[best_generation_index] = new_sa_solution;
                         generation_results[best_generation_index] = new_sa_length;
@@ -178,7 +181,7 @@ void AntColonySolver::solve() {
                             solution = new_sa_solution;
                         }
                     } else {
-                        double prob_sa_acceptance = exp(-difference_sa_curr / temperature);
+                        double prob_sa_acceptance = exp(-difference_sa_curr / temperature); // calculating the probability of accept the solution
                         double rand_p = (double) rand() / RAND_MAX;
                         if (rand_p < prob_sa_acceptance) {
                             new_sa_solution.pop_back();
@@ -187,7 +190,7 @@ void AntColonySolver::solve() {
                         }
                     }
                 }
-                temperature = temperature * temperature_max;
+                temperature = temperature * temperature_max; // updating the temperature
             }
 
 
@@ -209,7 +212,7 @@ void AntColonySolver::solve() {
 
             for (int j = 0; j < num_cities; j++) {
                 for (int k = 0; k < num_cities; k++) {
-                    pheromones_matrix[j][k] = (1 - rho) * pheromones_matrix[j][k] + delta_tau_table[j][k];
+                    pheromones_matrix[j][k] = (1 - rho) * pheromones_matrix[j][k] + delta_tau_table[j][k]; // dissipating part of old pheromone and spread the new quantities
                 }
             }
         }

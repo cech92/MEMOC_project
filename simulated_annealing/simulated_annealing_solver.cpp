@@ -19,7 +19,7 @@ SimulatedAnnealingSolver::SimulatedAnnealingSolver(Problem* problem, unsigned in
     this->stop_time = std::chrono::steady_clock::now() + std::chrono::seconds(this->max_execution_time);
 
     this->temperature_max = 0.995;
-    this->temperature_min = 1e-08;
+    this->temperature_min = 1e-09;
     this->temperature = temperature_max;
 
     vector<int> allow_list;
@@ -32,6 +32,7 @@ SimulatedAnnealingSolver::SimulatedAnnealingSolver(Problem* problem, unsigned in
     allow_list.erase(allow_list.begin() + best_solution[0]);
     int count = 0;
 
+    // create first solution selecting cheaper arc ad each iteration
     while (allow_list.size() > 0) {
         int next_city = -1;
         int element_to_remove = -1;
@@ -54,7 +55,8 @@ void SimulatedAnnealingSolver::solve() {
     vector<int> current_solution = best_solution;
     double current_length = min_length;
     int loops = 0;
-    while (std::chrono::steady_clock::now() < this->stop_time) {
+    // loop if there is enough temperature
+    while (std::chrono::steady_clock::now() < this->stop_time && temperature > temperature_min) {
         for (int i = 0; i < max_iterations; ++i) {
             if (std::chrono::steady_clock::now() >= this->stop_time) {
                 break;
@@ -74,11 +76,11 @@ void SimulatedAnnealingSolver::solve() {
             new_sa_solution[index1] = new_sa_solution[index2];
             new_sa_solution[index2] = temp;
             new_sa_solution.push_back(new_sa_solution[0]);
-            for (int l = 0; l < new_sa_solution.size() - 1; l++) {
+            for (int l = 0; l < new_sa_solution.size() - 1; l++) { // calculate new solution
                 new_sa_length += costs[new_sa_solution[l]][new_sa_solution[l + 1]];
             }
 
-            double difference_sa_curr = new_sa_length - current_length;
+            double difference_sa_curr = new_sa_length - current_length; // calculate difference between new and current solution
 
             if (difference_sa_curr < 0.0) {
                 new_sa_solution.pop_back();
@@ -89,7 +91,7 @@ void SimulatedAnnealingSolver::solve() {
                     best_solution = new_sa_solution;
                 }
             } else {
-                double prob_sa_acceptance = exp(-abs(difference_sa_curr) / temperature);
+                double prob_sa_acceptance = exp(-abs(difference_sa_curr) / temperature); // calculate probability of accept new solution even if worse
                 double rand_p = (double) rand() / RAND_MAX;
                 if (rand_p < prob_sa_acceptance) {
                     new_sa_solution.pop_back();

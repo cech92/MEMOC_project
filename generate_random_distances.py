@@ -19,7 +19,6 @@ def main(argv):
         coord = (random.randint(0, N), random.randint(0, N))
         if coord not in coords:
             coords.append(coord)
-            # outputFile.write(str(coord[0]) + " " + str(coord[1]) + "\n")
             i += 1
 
     for coord1 in coords:
